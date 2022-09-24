@@ -59,15 +59,12 @@ export const Game: React.FC<{}> = () => {
    * Checks if the game is solved.
    */
   function _isSolved(index: number, value: string) {
-    if (gameArray.every((cell: string, cellIndex: number) => {
-          if (cellIndex === index)
-            return value === solvedArray[cellIndex];
-          else
-            return cell === solvedArray[cellIndex];
-        })) {
-      return true;
-    }
-    return false;
+    return gameArray.every((cell: string, cellIndex: number) => {
+      if (cellIndex === index)
+        return value === solvedArray[cellIndex];
+      else
+        return cell === solvedArray[cellIndex];
+    });
   }
 
   /**
@@ -129,6 +126,19 @@ export const Game: React.FC<{}> = () => {
     setCellSelected(indexOfArray);
   }
 
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTableDataCellElement>) {
+    // ignore everything but numbers 1-9
+    if (e.key < '1' || e.key > '9') {
+      return;
+    }
+    // nothing to do in fastMode
+    if (fastMode) {
+      return;
+    }
+    e.preventDefault();
+    _userFillCell(cellSelected, e.key);
+  }
+
   /**
    * On Change Difficulty,
    * 1. Update 'Difficulty' level
@@ -145,6 +155,7 @@ export const Game: React.FC<{}> = () => {
    */
   function onClickNumber(number: string) {
     if (fastMode) {
+      setCellSelected(-1);
       setNumberSelected(number)
     } else if (cellSelected !== -1) {
       _userFillCell(cellSelected,number);
@@ -218,7 +229,6 @@ export const Game: React.FC<{}> = () => {
     _createNewGame();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   return (
     <>
       <div className={overlay?"container blur":"container"}>
@@ -226,7 +236,7 @@ export const Game: React.FC<{}> = () => {
         <div className="innercontainer">
           <GameSection
             onClick={(indexOfArray: number) => onClickCell(indexOfArray)}
-          />
+           onKeyDown={handleKeyDown}/>
           <StatusSection
             onClickNumber={(number: string) => onClickNumber(number)}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChangeDifficulty(e)}

@@ -1,8 +1,9 @@
 import React from 'react';
-import { useSudokuContext } from '../../context/SudokuContext';
+import {useSudokuContext} from '../../context/SudokuContext';
 
 type GameSectionProps = {
   onClick: (indexOfArray: number) => void
+  onKeyDown: (event: React.KeyboardEvent<HTMLTableDataCellElement>) => void
 };
 
 /**
@@ -79,18 +80,12 @@ export const GameSection = (props: GameSectionProps) => {
   function _selectedCell(indexOfArray: number, value: string, highlight: string) {
     if (value !== '0') {
       if (initArray[indexOfArray] === '0') {
-        return (
-          <td className={`game__cell game__cell--userfilled game__cell--${highlight}selected`} key={indexOfArray} onClick={() => props.onClick(indexOfArray)}>{value}</td>
-        )
+        return gameCell(indexOfArray, value, [`game__cell--userfilled`, `game__cell--${highlight}selected`]);
       } else {
-        return (
-          <td className={`game__cell game__cell--filled game__cell--${highlight}selected`} key={indexOfArray} onClick={() => props.onClick(indexOfArray)}>{value}</td>
-        )
+        return gameCell(indexOfArray, value, [`game__cell--filled`, `game__cell--${highlight}selected`]);
       }
     } else {
-      return (
-        <td className={`game__cell game__cell--${highlight}selected`} key={indexOfArray} onClick={() => props.onClick(indexOfArray)}>{value}</td>
-      )
+      return gameCell(indexOfArray, value, [`game__cell--${highlight}selected`]);
     }
   }
 
@@ -100,19 +95,25 @@ export const GameSection = (props: GameSectionProps) => {
   function _unselectedCell(indexOfArray: number, value: string) {
     if (value !== '0') {
       if (initArray[indexOfArray] === '0') {
-        return (
-          <td className="game__cell game__cell--userfilled" key={indexOfArray} onClick={() => props.onClick(indexOfArray)}>{value}</td>
-        )
+        return gameCell(indexOfArray, value, ['game__cell--userfilled'])
       } else {
-        return (
-          <td className="game__cell game__cell--filled" key={indexOfArray} onClick={() => props.onClick(indexOfArray)}>{value}</td>
-        )
+        return gameCell(indexOfArray, value, ['game__cell--filled'])
       }
     } else {
-      return (
-        <td className="game__cell" key={indexOfArray} onClick={() => props.onClick(indexOfArray)}>{value}</td>
-      )
+      return gameCell(indexOfArray, value, []);
     }
+  }
+
+  function gameCell(indexOfArray: number, value: string, extraClasses: string[]) {
+    return (
+      <td
+        className={`game__cell ${extraClasses.join(' ')}`}
+        key={indexOfArray}
+        tabIndex={0}
+        onKeyDown={props.onKeyDown}
+        onClick={() => props.onClick(indexOfArray)}>{value}
+      </td>
+    )
   }
 
   return (
